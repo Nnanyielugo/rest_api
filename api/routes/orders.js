@@ -6,6 +6,9 @@ const Product = require('../models/products')
 router.get('/', (req, res, next)=>{
     Order
         .find()
+        // add product information to each order
+        // pass an optional second property to specify the properties you want to populate
+        .populate('product', 'name')
         .exec()
         .then(doc =>{
             res.status(200).json(doc)
@@ -57,9 +60,10 @@ router.post('/', (req, res, next)=>{
 router.get('/:orderId', (req, res, next)=>{
     Order
         .findById(req.params.orderId)
+        .populate('product')
         .exec()
         .then(order =>{
-            if(!orderId){
+            if(!order){
                 return res.status(404).json({
                     message: "Order not found"
                 })

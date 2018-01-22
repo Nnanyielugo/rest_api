@@ -10,6 +10,8 @@ const orderRoutes = require('./api/routes/orders');
 const app = express();
 
 app.use(logger('dev'));
+// make upload path publicly accessible
+app.use('/uploads', express.static('uploads'))
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
@@ -27,28 +29,24 @@ app.use((req, res, next) =>{
 
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
-// app.use((req, res, next) =>{
-//     res.status(200).json({
-//         message: "it works"
-//     })
-// });
+
 
 // handle error, pass message, set statusCode, and pass error object to next()
-// app.use((req, res, next) =>{
-//     const error = new Error('Not found');
-//     error.status = 404;
-//     next(error)
-// });
+app.use((req, res, next) =>{
+    const error = new Error('Not found');
+    error.status = 404;
+    next(error)
+});
 
-// // catch 500 error and handle
-// app.use((error, req, res, next) => {
-//     res.status(error.status || 500);
-//     res.json({
-//         error:{
-//             message: error.message
-//         }
-//     })
-// })
+// catch 500 error and handle
+app.use((error, req, res, next) => {
+    res.status(error.status || 500);
+    res.json({
+        error:{
+            message: error.message
+        }
+    })
+})
 
 app.set('port', process.env.PORT || 3500);
 

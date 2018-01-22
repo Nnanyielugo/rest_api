@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const mongoose = require('mongoose');
 const multer = require('multer');
+const checkAuth = require('../middleware/checkAuth');
 
 // multer config
 const storage = multer.diskStorage({
@@ -61,7 +62,8 @@ router.get('/', (req, res, next)=>{
 // add product image to product using multer
 // multer also parses body
 // make productImage hold the url of the image
-router.post('/', upload.single('productImage'), (req, res, next)=>{
+// add auth middleware to post route
+router.post('/', checkAuth, upload.single('productImage'), (req, res, next)=>{
     console.log(req.file)
    
     const product = new Product({
@@ -111,7 +113,7 @@ router.get('/:productId', (req, res, next)=>{
         });
 });
 
-router.patch('/:productId', (req, res, next)=>{
+router.patch('/:productId', checkAuth, (req, res, next)=>{
     const id = req.params.productId;
     // pass the entire request body to the update function so that only values passed in are updated
     Product
@@ -129,7 +131,7 @@ router.patch('/:productId', (req, res, next)=>{
         });
 });
 
-router.delete('/:productId', (req, res, next)=>{
+router.delete('/:productId', checkAuth, (req, res, next)=>{
     const id = req.params.productId;
     Product
         .remove({_id: id})

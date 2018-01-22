@@ -17,3 +17,4 @@ mongoose.connection.on('disconnect', function(){
 });
 
 require('./models/products');
+require('./models/order');

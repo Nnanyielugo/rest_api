@@ -1,104 +1,13 @@
 const router = require('express').Router();
-const mongoose = require('mongoose');
-const Order = require('../models/order');
-const Product = require('../models/products')
 const checkAuth = require('../middleware/checkAuth');
+const orderController = require('../controllers/orders'); 
 
-router.get('/', checkAuth, (req, res, next)=>{
-    Order
-        .find()
-        // add product information to each order
-        // pass an optional second property to specify the properties you want to populate
-        .populate('product', 'name')
-        .exec()
-        .then(doc =>{
-            res.status(200).json(doc)
-        })
-        .catch(err =>{
-            console.log(err);
-            res.status(500).json({
-                message: err
-            })
-        })
-})
+router.get('/', checkAuth, orderController.orders_get);
 
-router.post('/', checkAuth, (req, res, next)=>{
+router.post('/', checkAuth, orderController.order_make);
 
-    Product.findById(req.body.productId)
-        .then(product =>{
-            if(!product){
-                return res.status(404).json({
-                    message: "product not found"
-                })
-            }
-            const order =  new Order({
-                _id: new mongoose.Types.ObjectId(),
-                quantity: req.body.quantity,
-                product: req.body.productId
-            });
-            return order
-                .save();
-            }).then(result =>{
-                console.log(result);
-                res.status(201).json({
-                    message: 'Order stored',
-                    createdOrder: {
-                        _id: result.id,
-                        product : result.product,
-                        quantity: result.quantity
-                    }
-                });
-            })
-            .catch(err =>{
-                console.log(err);
-                res.status(500).json({
-                    error: err
-                });
-            });        
-})
+router.get('/:orderId', checkAuth, orderController.order_getOne);
 
-
-router.get('/:orderId', checkAuth, (req, res, next)=>{
-    Order
-        .findById(req.params.orderId)
-        .populate('product')
-        .exec()
-        .then(order =>{
-            if(!order){
-                return res.status(404).json({
-                    message: "Order not found"
-                })
-            }else {
-                res.status(200).json({
-                    order: order 
-                });
-            };
-        })
-        .catch(err =>{
-            console.log(err)
-            res.status(500).json({
-                message: err
-            })
-        })
-})
-
-
-router.delete('/:orderId', checkAuth, (req, res, next)=>{
-    const id = req.params.orderId;
-    Order
-        .remove({_id: id})
-        .exec()
-        .then(result =>{
-            res.status(200).json({
-                message: "Order deleted"
-            })
-        })
-        .catch(err =>{
-            console.log(err)
-            res.send(500).json({
-                error: err
-            })
-        });
-})
+router.delete('/:orderId', checkAuth, orderController.order_delete);
 
 module.exports = router

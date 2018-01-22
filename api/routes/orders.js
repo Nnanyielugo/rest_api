@@ -31,7 +31,7 @@ router.post('/', (req, res, next)=>{
                 })
             }
             const order =  new Order({
-                _id: mongoose.Types.ObjectId(),
+                _id: new mongoose.Types.ObjectId(),
                 quantity: req.body.quantity,
                 product: req.body.productId
             });
@@ -88,7 +88,9 @@ router.delete('/:orderId', (req, res, next)=>{
         .remove({_id: id})
         .exec()
         .then(result =>{
-            res.status(204).json(order)
+            res.status(200).json({
+                message: "Order deleted"
+            })
         })
         .catch(err =>{
             console.log(err)

@@ -6,6 +6,7 @@ require('./api/db');
 
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
+const userRoutes = require('./api/routes/user');
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use((req, res, next) =>{
 
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
+app.use('/user', userRoutes);
 
 
 // handle error, pass message, set statusCode, and pass error object to next()
